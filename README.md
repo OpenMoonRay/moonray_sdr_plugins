@@ -3,4 +3,4 @@ These plugins add descriptions of the moonray shader DSOs to the Pixar shader re
 which is required to use them as shader nodes in USD/Hydra.
 
 This repository is part of the larger MoonRay/Arras codebase.  It is included as a submodule in the top-level
-OpenMoonRay repository located here: [OpenMoonRay](https://github.com/dreamworksanimation/openmoonray)
+OpenMoonRay repository located here: [OpenMoonRay](https://github.com/OpenMoonRay/openmoonray)
