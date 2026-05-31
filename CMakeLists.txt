@@ -20,3 +20,7 @@ find_package(Python REQUIRED COMPONENTS Development)
 
 add_subdirectory(moonrayShaderDiscovery)
 add_subdirectory(moonrayShaderParser)
+
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/sitecustomize.py
+        DESTINATION lib/python
+)
