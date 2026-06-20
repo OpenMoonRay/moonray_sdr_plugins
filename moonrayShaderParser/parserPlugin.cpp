@@ -88,7 +88,7 @@ VtValue convertVector(const JsValue& val,
 VtValue convertDefault(const JsValue& val,
                        const std::string& attrType)
 {
-    if (attrType == "Bool") return VtValue(val.GetBool() ? 0 : 1);
+    if (attrType == "Bool") return VtValue(val.GetBool());
     if (attrType == "Int") return VtValue(val.GetInt());
     if (attrType == "Long") return VtValue(val.GetInt64());
     if (attrType == "Float") return VtValue((float)val.GetReal());
@@ -124,7 +124,7 @@ VtValue convertDefault(const JsValue& val,
         for (const JsValue& val : arr) {
             data.emplace_back(val.GetArrayOf<double>());
         }
-        return VtValue(GfMatrix4f(data));
+        return VtValue(GfMatrix4d(data));
     }
     if (attrType == "Mat4d") {
         std::vector<std::vector<double>> data;
@@ -138,7 +138,7 @@ VtValue convertDefault(const JsValue& val,
         // can't initialize to anything except null
         return VtValue(nullSceneObjectPtr);
     }
-    if (attrType == "BoolVector") return convertVector<int>(val,"Bool");
+    if (attrType == "BoolVector") return convertVector<bool>(val,"Bool");
     if (attrType == "IntVector") return convertVector<int>(val,"Int");
     if (attrType == "LongVector") return convertVector<int64_t>(val,"Long");
     if (attrType == "FloatVector") return convertVector<float>(val,"Float");
@@ -146,14 +146,13 @@ VtValue convertDefault(const JsValue& val,
     if (attrType == "StringVector") return convertVector<std::string>(val,"String");
     if (attrType == "RgbVector") return convertVector<GfVec3f>(val,"Rgb");
     if (attrType == "Vec3fVector") return convertVector<GfVec3f>(val,"Vec3f");
-    if (attrType == "RgbaVector") return convertVector<GfVec3f>(val,"Rgba");
-    if (attrType == "Vec4f") return convertVector<GfVec4f>(val,"Vec4f");
+    if (attrType == "RgbaVector") return convertVector<GfVec4f>(val,"Rgba");
     if (attrType == "Vec2fVector") return convertVector<GfVec2f>(val,"Vec2f");
     if (attrType == "Vec2dVector") return convertVector<GfVec2d>(val,"Vec2d");
     if (attrType == "Vec3dVector") return convertVector<GfVec3d>(val,"Vec3d");
     if (attrType == "Vec4fVector") return convertVector<GfVec4f>(val,"Vec4f");
     if (attrType == "Vec4dVector") return convertVector<GfVec4d>(val,"Vec4d");
-    if (attrType == "Mat4fVector") return convertVector<GfMatrix4f>(val,"Mat4f");
+    if (attrType == "Mat4fVector") return convertVector<GfMatrix4d>(val,"Mat4f");
     if (attrType == "Mat4dVector") return convertVector<GfMatrix4d>(val,"Mat4d");
     if (attrType == "SceneObjectVector" || attrType == "SceneObjectIndexable")
         return convertVector<TfToken>(val,"SceneObject");
@@ -165,6 +164,9 @@ VtValue convertVector(const JsValue& val,
                        const std::string& baseType)
 {
     VtArray<T> arrayOut;
+    if (val.IsNull()) {
+        return VtValue(arrayOut);
+    }
     const JsArray& arrayIn = val.GetJsArray();
     for (const JsValue& elem : arrayIn) {
         VtValue vtElem = convertDefault(elem,baseType);
@@ -175,8 +177,42 @@ VtValue convertVector(const JsValue& val,
 
 bool isDynamicVector(const std::string& type)
 {
+    if (type == "SceneObjectIndexable") {
+        return true;
+    }
     return (type.size() > 6) &&
         (type.substr(type.size()-6,std::string::npos) == "Vector");
+}
+
+TfToken getSdfType(const std::string& attrType)
+{
+    if (attrType == "Bool") return TfToken("bool");
+    if (attrType == "Long") return TfToken("int64");
+    if (attrType == "Double") return TfToken("double");
+    if (attrType == "Rgb") return TfToken("color3f");
+    if (attrType == "Rgba") return TfToken("color4f");
+    if (attrType == "Vec2d") return TfToken("double2");
+    if (attrType == "Vec3d") return TfToken("double3");
+    if (attrType == "Vec4d") return TfToken("double4");
+    if (attrType == "Mat4f" || attrType == "Mat4d") return TfToken("matrix4d");
+    if (attrType == "SceneObject*") return TfToken("token");
+    if (attrType == "BoolVector") return TfToken("bool[]");
+    if (attrType == "IntVector") return TfToken("int[]");
+    if (attrType == "LongVector") return TfToken("int64[]");
+    if (attrType == "FloatVector") return TfToken("float[]");
+    if (attrType == "DoubleVector") return TfToken("double[]");
+    if (attrType == "StringVector") return TfToken("string[]");
+    if (attrType == "RgbVector") return TfToken("color3f[]");
+    if (attrType == "RgbaVector") return TfToken("color4f[]");
+    if (attrType == "Vec2fVector") return TfToken("float2[]");
+    if (attrType == "Vec3fVector") return TfToken("float3[]");
+    if (attrType == "Vec4fVector") return TfToken("float4[]");
+    if (attrType == "Vec2dVector") return TfToken("double2[]");
+    if (attrType == "Vec3dVector") return TfToken("double3[]");
+    if (attrType == "Vec4dVector") return TfToken("double4[]");
+    if (attrType == "Mat4fVector" || attrType == "Mat4dVector") return TfToken("matrix4d[]");
+    if (attrType == "SceneObjectVector" || attrType == "SceneObjectIndexable") return TfToken("token[]");
+    return TfToken();
 }
 
 const TfToken getNodeContext(const JsObject& definition)
@@ -262,6 +298,12 @@ getNodeProperties(const NdrNodeDiscoveryResult& discoveryResult,
             if (mdIt != attrMetadata.end()) metadata[SdrPropertyMetadata->Label] = mdIt->second.GetString();
             mdIt = attrMetadata.find("comment");
             if (mdIt != attrMetadata.end()) metadata[SdrPropertyMetadata->Help] = mdIt->second.GetString();
+            mdIt = attrMetadata.find("structure_name");
+            if (mdIt != attrMetadata.end()) metadata[TfToken("structure_name")] = mdIt->second.GetString();
+            mdIt = attrMetadata.find("structure_path");
+            if (mdIt != attrMetadata.end()) metadata[TfToken("structure_path")] = mdIt->second.GetString();
+            mdIt = attrMetadata.find("structure_type");
+            if (mdIt != attrMetadata.end()) metadata[TfToken("structure_type")] = mdIt->second.GetString();
         }
 
         // "page" metadata is set from group name
@@ -270,8 +312,14 @@ getNodeProperties(const NdrNodeDiscoveryResult& discoveryResult,
             metadata[SdrPropertyMetadata->Page] = groupIt->second;
         }
 
-        if (isDynamicVector(attrType))
+        const TfToken sdfType = getSdfType(attrType);
+        if (!sdfType.IsEmpty()) {
+            metadata[SdrPropertyMetadata->SdrUsdDefinitionType] = sdfType;
+        }
+
+        if (isDynamicVector(attrType)) {
             metadata[SdrPropertyMetadata->IsDynamicArray] = TfToken("true");
+        }
 
         auto bindIt = attrData.find("bindable");
         if (bindIt != attrData.end() &&
