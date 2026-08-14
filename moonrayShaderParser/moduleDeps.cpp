@@ -17,8 +17,8 @@ TF_REGISTRY_FUNCTION(TfScriptModuleLoader) {
         TfToken("ndr"),
         TfToken("sdr")
     };
-    TfScriptModuleLoader::GetInstance().
-        RegisterLibrary(TfToken("moonrayShaderParser"), TfToken("pxr.MoonrayShaderParser"), reqs);
+    TfScriptModuleLoader::GetInstance().RegisterLibrary(
+        TfToken("moonrayShaderParser"), TfToken(), reqs);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
