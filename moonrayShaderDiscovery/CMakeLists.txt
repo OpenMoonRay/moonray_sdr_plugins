@@ -25,7 +25,7 @@ target_include_directories(${component}
 target_link_libraries(${component}
     PUBLIC
         # pxr
-        ar ndr sdr
+        ar sdr
         Boost::headers
         # Python::Module
 )
