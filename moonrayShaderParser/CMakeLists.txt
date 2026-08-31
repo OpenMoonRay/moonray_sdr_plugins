@@ -33,10 +33,18 @@ target_include_directories(${component}
 target_link_libraries(${component}
     PUBLIC
         # pxr
-        ar ndr sdr
+        ar sdr
         Boost::headers
         # Python::Module
 )
+
+# SideFX wraps Boost.Python in USD's pxr_boost namespace.  VtValue's inline
+# Python conversion helpers therefore resolve from libpxr_python rather than
+# Houdini's unwrapped libhboost_python library.
+if(IsDarwinPlatform AND DEFINED ENV{PXR_LIB_PREFIX})
+    target_link_libraries(${component} PUBLIC
+        "$ENV{PXR_LIB_PREFIX}/libpxr_python${CMAKE_SHARED_LIBRARY_SUFFIX}")
+endif()
 
 if(NOT IsDarwinPlatform)
     # Use RUNPATH instead of RPATH

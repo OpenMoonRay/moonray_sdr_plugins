@@ -12,7 +12,7 @@
 #include "pxr/usd/ar/resolver.h"
 #include "pxr/usd/ar/resolverScopedCache.h"
 
-#include "pxr/usd/ndr/debugCodes.h"
+#include "pxr/usd/sdr/debugCodes.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -20,11 +20,11 @@ TfToken moonrayNodeType("moonrayClass");
 
 namespace {
 
-bool examineFiles(NdrNodeDiscoveryResultVec* foundNodes,
-                  NdrStringSet* foundNames,
-                  const NdrDiscoveryPluginContext* context,
+bool examineFiles(SdrShaderNodeDiscoveryResultVec* foundNodes,
+                  SdrStringSet* foundNames,
+                  const SdrDiscoveryPluginContext* context,
                   const std::string& dirPath,
-                  const NdrStringVec& dirFileNames)
+                  const SdrStringVec& dirFileNames)
 {
     for (const std::string& fileName : dirFileNames) {
         std::string extension = TfStringToLower(TfGetExtension(fileName));
@@ -33,15 +33,15 @@ bool examineFiles(NdrNodeDiscoveryResultVec* foundNodes,
             std::string className = TfStringGetBeforeSuffix(fileName, '.');
 
             if (!foundNames->insert(className).second) {
-                 TF_DEBUG(NDR_DISCOVERY).Msg(
+                 TF_DEBUG(SDR_DISCOVERY).Msg(
                      "Duplicate moonray class [%s] found at URI [%s], ignoring.",
                      className.c_str(), uri.c_str());
                 continue;
             }
 
             foundNodes->emplace_back(
-                NdrIdentifier(className),          // Identifier
-                NdrVersion().GetAsDefault(),       // Version
+                SdrIdentifier(className),          // Identifier
+                SdrVersion().GetAsDefault(),       // Version
                 className,                         // Name
                 TfToken(),                         // Family
                 moonrayNodeType,                   // DiscoveryType
@@ -57,7 +57,7 @@ bool examineFiles(NdrNodeDiscoveryResultVec* foundNodes,
 }
 } // namespace {
 
-const NdrStringVec&
+const SdrStringVec&
 MoonrayDiscoveryPlugin::GetSearchURIs() const
 {
     return _searchPaths;
@@ -71,11 +71,11 @@ MoonrayDiscoveryPlugin::MoonrayDiscoveryPlugin()
     }
 }
 
-NdrNodeDiscoveryResultVec
-MoonrayDiscoveryPlugin::DiscoverNodes(const Context& context)
+SdrShaderNodeDiscoveryResultVec
+MoonrayDiscoveryPlugin::DiscoverShaderNodes(const Context& context)
 {
-    NdrNodeDiscoveryResultVec foundNodes;
-    NdrStringSet foundNames;
+    SdrShaderNodeDiscoveryResultVec foundNodes;
+    SdrStringSet foundNames;
     ArResolverScopedCache resolverCache;
 
     for (const std::string& searchPath : _searchPaths) {
@@ -103,6 +103,6 @@ MoonrayDiscoveryPlugin::DiscoverNodes(const Context& context)
     return foundNodes;
 }
 
-NDR_REGISTER_DISCOVERY_PLUGIN(MoonrayDiscoveryPlugin);
+SDR_REGISTER_DISCOVERY_PLUGIN(MoonrayDiscoveryPlugin);
 
 PXR_NAMESPACE_CLOSE_SCOPE

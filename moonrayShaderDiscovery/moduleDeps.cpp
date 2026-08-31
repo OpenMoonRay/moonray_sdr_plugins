@@ -14,11 +14,10 @@ TF_REGISTRY_FUNCTION(TfScriptModuleLoader) {
     // List of direct dependencies for this library.
     const std::vector<TfToken> reqs = {
         TfToken("ar"),
-        TfToken("ndr"),
         TfToken("sdr")
     };
-    TfScriptModuleLoader::GetInstance().
-        RegisterLibrary(TfToken("moonrayShaderDiscovery"), TfToken("pxr.MoonrayShaderDiscovery"), reqs);
+    TfScriptModuleLoader::GetInstance().RegisterLibrary(
+        TfToken("moonrayShaderDiscovery"), TfToken(), reqs);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

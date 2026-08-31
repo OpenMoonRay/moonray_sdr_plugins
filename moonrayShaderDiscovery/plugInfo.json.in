@@ -4,7 +4,7 @@
             "Info": {
                 "Types": {
                     "MoonrayDiscoveryPlugin" : {
-                        "bases": ["NdrDiscoveryPlugin"],
+                        "bases": ["SdrDiscoveryPlugin"],
                         "displayName": "Moonray shader definition discovery plugin."
                     }
                 }

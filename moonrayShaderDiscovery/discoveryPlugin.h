@@ -7,25 +7,24 @@
 #include "pxr/pxr.h"
 #include "pxr/base/tf/token.h"
 
-#include "pxr/usd/ndr/declare.h"
-#include "pxr/usd/ndr/discoveryPlugin.h"
-#include "pxr/usd/ndr/parserPlugin.h"
+#include "pxr/usd/sdr/declare.h"
+#include "pxr/usd/sdr/discoveryPlugin.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class MoonrayDiscoveryPlugin : public NdrDiscoveryPlugin {
+class MoonrayDiscoveryPlugin : public SdrDiscoveryPlugin {
 public:
     MoonrayDiscoveryPlugin();
 
     ~MoonrayDiscoveryPlugin() override = default;
 
-    virtual NdrNodeDiscoveryResultVec DiscoverNodes(const Context &context)
+    virtual SdrShaderNodeDiscoveryResultVec DiscoverShaderNodes(const Context &context)
         override;
 
-    virtual const NdrStringVec& GetSearchURIs() const override;
+    virtual const SdrStringVec& GetSearchURIs() const override;
 
 private:
-    NdrStringVec _searchPaths;
+    SdrStringVec _searchPaths;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
