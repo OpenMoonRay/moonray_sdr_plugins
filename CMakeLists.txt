@@ -16,6 +16,16 @@ if(NOT pxr_FOUND)
     find_package(pxr REQUIRED)
 endif()
 
+if(PXR_VERSION VERSION_GREATER_EQUAL 2605)
+    set(MOONRAY_SHADER_PLUGIN_LIBRARIES ar sdr)
+    set(MOONRAY_DISCOVERY_PLUGIN_BASE_CLASS SdrDiscoveryPlugin)
+    set(MOONRAY_PARSER_PLUGIN_BASE_CLASS SdrParserPlugin)
+else()
+    set(MOONRAY_SHADER_PLUGIN_LIBRARIES ar ndr sdr)
+    set(MOONRAY_DISCOVERY_PLUGIN_BASE_CLASS NdrDiscoveryPlugin)
+    set(MOONRAY_PARSER_PLUGIN_BASE_CLASS NdrParserPlugin)
+endif()
+
 find_package(Python REQUIRED COMPONENTS Development)
 
 add_subdirectory(moonrayShaderDiscovery)

@@ -33,7 +33,7 @@ target_include_directories(${component}
 target_link_libraries(${component}
     PUBLIC
         # pxr
-        ar ndr sdr
+        ${MOONRAY_SHADER_PLUGIN_LIBRARIES}
         Boost::headers
         # Python::Module
 )
@@ -71,5 +71,4 @@ install(TARGETS ${component}
 install(FILES ${plugInfoFile}
         DESTINATION plugin/pxr/moonrayShaderParser
 )
-
 

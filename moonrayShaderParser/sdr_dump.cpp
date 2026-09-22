@@ -11,6 +11,8 @@
 #include <pxr/usd/sdr/declare.h>
 #include <pxr/usd/sdr/shaderProperty.h>
 
+#include "../UsdShaderApi.h"
+
 #include <string>
 #include <iostream>
 
@@ -35,7 +37,7 @@ void dumpProperty(SdrShaderPropertyConstPtr prop)
     std::tie<SdfValueTypeName,TfToken>(sdfTypeName,backupType) = prop->GetTypeAsSdfType();
     TfToken sdfType = sdfTypeName.GetAsToken();
     TfToken propType = prop->GetType();
-    const NdrOptionVec& options = prop->GetOptions();
+    const MoonrayUsdShaderApi::OptionVec& options = prop->GetOptions();
     if (!options.empty()) propType = TfToken("enum");
 
     std::cout << TABSTR;
@@ -55,7 +57,7 @@ void dumpProperty(SdrShaderPropertyConstPtr prop)
         }
         std::cout << std::endl;
     }
-    const NdrTokenMap&  metadata = prop->GetMetadata();
+    const MoonrayUsdShaderApi::TokenMap& metadata = prop->GetMetadata();
     for (const auto& item : metadata) {
         std::cout << TABSTR << TABSTR << "* " << item.first << " = " << item.second << std::endl;
     }
@@ -80,17 +82,17 @@ void dumpNode(SdrShaderNodeConstPtr node)
               << "IsValid:    " << node->IsValid() << std::endl;
 
     std::cout << "INPUTS:" << std::endl;
-    const NdrTokenVec& inputNames = node->GetInputNames();
+    const MoonrayUsdShaderApi::TokenVec& inputNames = node->GetInputNames();
     for (const TfToken& name : inputNames) {
         dumpProperty(node->GetShaderInput(name));
     }
     std::cout << "OUTPUTS:" << std::endl;
-    const NdrTokenVec& outputNames = node->GetOutputNames();
+    const MoonrayUsdShaderApi::TokenVec& outputNames = node->GetOutputNames();
     for (const TfToken& name : outputNames) {
         dumpProperty(node->GetShaderOutput(name));
     }
     std::cout << "METADATA:" << std::endl;
-    const NdrTokenMap& metadata = node->GetMetadata();
+    const MoonrayUsdShaderApi::TokenMap& metadata = node->GetMetadata();
     for (const auto& item : metadata) {
         std::cout << TABSTR << "* " << item.first << " = " << item.second << std::endl;
     }
@@ -109,4 +111,3 @@ int main(int argc, char *argv[])
     }
     return 0;
 }
-
